@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Voice Caesar</title>
+<style>
+  body{
+    background:#050b10;
+    color:#d8fff7;
+    font-family: system-ui, Arial;
+    padding:30px;
+  }
+  button, select, input{
+    background:#0a1e2a;
+    color:#2bf2d0;
+    border:1px solid #2bf2d0;
+    padding:10px 14px;
+    border-radius:10px;
+    cursor:pointer;
+    margin:6px 0;
+  }
+  .panel{
+    max-width:500px;
+    border:1px solid #2bf2d055;
+    padding:20px;
+    border-radius:16px;
+  }
+  .status{ margin-top:10px; color:#8fe8db; }
+</style>
+</head>
+<body>
+
+<div class="panel">
+  <h2>🎙️ Voice ⇄ Caesar ⇄ 🔊</h2>
+
+  <label>Режим</label><br>
+  <select id="mode">
+    <option value="enc">Encrypt (шифровать)</option>
+    <option value="dec">Decrypt (расшифровать)</option>
+  </select><br><br>
+
+  <label>Сдвиг (ключ Цезаря)</label><br>
+  <input type="number" id="shift" value="3" min="1" max="33"><br><br>
+
+  <button id="start">🎙️ Говорить</button>
+  <button id="stop" disabled>⏹️ Стоп</button>
+
+  <div class="status" id="status">Ожидание…</div>
+</div>
+
+<script>
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const rec = new SpeechRecognition();
+rec.lang = "ru-RU";
+rec.interimResults = false;
+
+const status = document.getElementById("status");
+const startBtn = document.getElementById("start");
+const stopBtn = document.getElementById("stop");
+
+const RU = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
+const ruLower = RU.toLowerCase();
+
+function caesar(text, shift){
+  return text.split("").map(ch=>{
+    let i = RU.indexOf(ch);
+    if(i !== -1) return RU[(i + shift + RU.length) % RU.length];
+    i = ruLower.indexOf(ch);
+    if(i !== -1) return ruLower[(i + shift + RU.length) % RU.length];
+    return ch;
+  }).join("");
+}
+
+function speak(text){
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "ru-RU";
+  speechSynthesis.speak(u);
+}
+
+rec.onstart = ()=>{
+  status.textContent = "🎙️ Слушаю…";
+  startBtn.disabled = true;
+  stopBtn.disabled = false;
+};
+
+rec.onend = ()=>{
+  startBtn.disabled = false;
+  stopBtn.disabled = true;
+};
+
+rec.onresult = (e)=>{
+  const heard = e.results[0][0].transcript;
+  const shift = Number(document.getElementById("shift").value);
+  const mode = document.getElementById("mode").value;
+
+  const result = mode === "enc"
+    ? caesar(heard, shift)
+    : caesar(heard, -shift);
+
+  status.textContent =
+    `Слышал: "${heard}"\nОтвет: "${result}"`;
+
+  speak(result);
+};
+
+startBtn.onclick = ()=>rec.start();
+stopBtn.onclick = ()=>rec.stop();
+</script>
+
+</body>
+</html>
