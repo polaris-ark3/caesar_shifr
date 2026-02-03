@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Футы → см и м</title>
+<style>
+  body{
+    background:#050b10;
+    color:#d8fff7;
+    font-family: system-ui, Arial;
+    padding:30px;
+  }
+  .panel{
+    max-width:420px;
+    border:1px solid #2bf2d055;
+    padding:20px;
+    border-radius:16px;
+  }
+  input, button{
+    width:100%;
+    margin:8px 0;
+    padding:10px;
+    background:#0a1e2a;
+    color:#2bf2d0;
+    border:1px solid #2bf2d0;
+    border-radius:10px;
+    font-size:16px;
+  }
+  .result{
+    margin-top:12px;
+    font-size:18px;
+    color:#8fe8db;
+  }
+</style>
+</head>
+<body>
+
+<div class="panel">
+  <h2>📏 Футы → см / м</h2>
+
+  <input id="feet" type="number" step="0.01" placeholder="Введите футы">
+
+  <button onclick="convert()">Перевести</button>
+
+  <div class="result" id="out"></div>
+
+  <button onclick="location.href='index.html'">
+    ⬅ Назад
+  </button>
+</div>
+
+<script>
+function convert(){
+  const feet = parseFloat(document.getElementById("feet").value);
+  if (isNaN(feet)) {
+    document.getElementById("out").textContent = "Введите число";
+    return;
+  }
+  const cm = feet * 30.48;
+  const m  = feet * 0.3048;
+
+  document.getElementById("out").innerHTML =
+    `${feet} ft = <br>
+     ${cm.toFixed(2)} см<br>
+     ${m.toFixed(3)} м`;
+}
+</script>
+
+</body>
+</html>
